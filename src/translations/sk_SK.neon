@@ -1,0 +1,46 @@
+months:
+	january: január
+	february: február
+	march: marec
+	april: apríl
+	may: máj
+	june: jún
+	july: júl
+	august: august
+	september: septembra
+	october: október
+	november: november
+	december: december
+days:
+	monday: pondelok
+	tuesday: utorok
+	wednesday: streda
+	thursday: štvrtok
+	friday: piatok
+	saturday: sobota
+	sunday: nedeľa
+ago:
+	justNow: práve teraz
+	second:
+		1: pred chvíľou
+		2: pred chvíľou
+		?: pred %s sek.
+	minute:
+		1: pred minútou
+		?: pred %s min.
+	hour:
+		1: pred hodinou
+		?: pred %s hod.
+	day:
+		1: včera
+		2: predvčerom
+		?: pred %s dňami
+	week:
+		1: pred týždňom
+		?: pred %s týždňami
+	month:
+		1: pred mesiacom
+		?: pred %s mesiacmi
+	year:
+		1: pred rokom
+		?: pred %s rokmi

@@ -1,0 +1,46 @@
+months:
+	january: leden
+	february: únor
+	march: březen
+	april: duben
+	may: květen
+	june: červen
+	july: červenec
+	august: srpen
+	september: září
+	october: říjen
+	november: listopad
+	december: prosinec
+days:
+	monday: pondělí
+	tuesday: úterý
+	wednesday: středa
+	thursday: čtvrtek
+	friday: pátek
+	saturday: sobota
+	sunday: neděle
+ago:
+	justNow: právě teď
+	second:
+		1: před chvílí
+		2: před chvílí
+		?: před %s sek.
+	minute:
+		1: před minutou
+		?: před %s min.
+	hour:
+		1: před hodinou
+		?: před %s hod.
+	day:
+		1: včera
+		2: předevčírem
+		?: před %s dny
+	week:
+		1: před týdnem
+		?: před %s týdny
+	month:
+		1: před měsícem
+		?: před %s měsíci
+	year:
+		1: před rokem
+		?: před %s roky

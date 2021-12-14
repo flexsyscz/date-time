@@ -1,0 +1,45 @@
+months:
+	january: january
+	february: february
+	march: march
+	april: april
+	may: may
+	june: june
+	july: july
+	august: august
+	september: september
+	october: october
+	november: november
+	december: december
+days:
+	monday: monday
+	tuesday: tuesday
+	wednesday: wednesday
+	thursday: thursday
+	friday: friday
+	saturday: saturday
+	sunday: sunday
+ago:
+	justNow: just now
+	second:
+		1: few moments ago
+		2: few moments ago
+		?: %s secs. ago
+	minute:
+		1: a minute ago
+		?: %s mins. ago
+	hour:
+		1: an hour ago
+		?: %s hrs. ago
+	day:
+		1: yesterday
+		?: %s days ago
+	week:
+		1: a week ago
+		?: %s weeks ago
+	month:
+		1: a month ago
+		?: %s months ago
+	year:
+		1: last year
+		?: %s years ago
