@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Flexsyscz\DateTime;
@@ -25,7 +26,10 @@ class DateTimeProvider
 	 * @param array|string[] $publicHolidays
 	 * @throws Exception
 	 */
-	public function __construct(array $format = ['date' => 'j. n. Y', 'time' => 'H:i'], array $publicHolidays = ['Y-01-01', 'Y-05-01', 'Y-05-08', 'Y-07-05', 'Y-07-06', 'Y-09-28', 'Y-10-28', 'Y-11-17', 'Y-12-24', 'Y-12-25', 'Y-12-26'])
+	public function __construct(
+		array $format = ['date' => 'j. n. Y', 'time' => 'H:i'],
+		array $publicHolidays = ['Y-01-01', 'Y-05-01', 'Y-05-08', 'Y-07-05', 'Y-07-06', 'Y-09-28', 'Y-10-28', 'Y-11-17', 'Y-12-24', 'Y-12-25', 'Y-12-26'],
+	)
 	{
 		$this->locale['date'] = $format['date'];
 		$this->locale['time'] = $format['time'];
@@ -173,6 +177,6 @@ class DateTimeProvider
 
 	public function isWeekend(DateTimeImmutable $dateTime): bool
 	{
-		return intval($dateTime->format('N')) >= 6;
+		return (int) ($dateTime->format('N')) >= 6;
 	}
 }
