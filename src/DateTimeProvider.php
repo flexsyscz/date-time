@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Flexsyscz\DateTime;
 
-use Exception;
 use Flexsyscz\Localization\TranslatedComponent;
 use Nette\Utils\Strings;
 use Nextras\Dbal\Utils\DateTimeImmutable;
@@ -17,27 +16,22 @@ class DateTimeProvider
 	/** @var string[] */
 	private array $locale;
 
-	/** @var DateTimeImmutable[] */
-	private array $publicHolidays;
+	private PublicHolidayChecker $publicHolidayChecker;
 
 
 	/**
 	 * @param array|string[] $format
-	 * @param array|string[] $publicHolidays
-	 * @throws Exception
+	 * @param PublicHolidayChecker $publicHolidayChecker
 	 */
 	public function __construct(
+		PublicHolidayChecker $publicHolidayChecker,
 		array $format = ['date' => 'j. n. Y', 'time' => 'H:i'],
-		array $publicHolidays = ['Y-01-01', 'Y-05-01', 'Y-05-08', 'Y-07-05', 'Y-07-06', 'Y-09-28', 'Y-10-28', 'Y-11-17', 'Y-12-24', 'Y-12-25', 'Y-12-26'],
 	)
 	{
+		$this->publicHolidayChecker = $publicHolidayChecker;
+
 		$this->locale['date'] = $format['date'];
 		$this->locale['time'] = $format['time'];
-
-		$this->publicHolidays = [];
-		foreach ($publicHolidays as $publicHoliday) {
-			$this->publicHolidays[] = new DateTimeImmutable(date($publicHoliday));
-		}
 	}
 
 
@@ -156,22 +150,7 @@ class DateTimeProvider
 
 	public function isPublicHoliday(DateTimeImmutable $dateTime): bool
 	{
-		foreach ($this->publicHolidays as $publicHoliday) {
-			if ($publicHoliday->format('m-d') === $dateTime->format('m-d')) {
-				return true;
-			}
-		}
-
-		$now = self::now();
-		$easter = $now->setTimestamp(easter_date((int) $dateTime->format('Y')));
-
-		foreach (['-2 days', '+1 day'] as $offset) {
-			if ($easter->modify($offset)->format('m-d') === $dateTime->format('m-d')) {
-				return true;
-			}
-		}
-
-		return false;
+		return $this->publicHolidayChecker->check($this->translatorNamespace->getTranslator()->getLanguage(), $dateTime);
 	}
 
 

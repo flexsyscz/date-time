@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\DateTime;
 
 use Flexsyscz\DateTime\DateTimeProvider;
+use Flexsyscz\DateTime\PublicHolidayChecker;
 use Flexsyscz\Localization;
 use Nextras\Dbal\Utils\DateTimeImmutable;
 use Tester\Assert;
@@ -41,7 +42,7 @@ class DateTimeProviderTest extends TestCase
 		$properties->logging = true;
 		$properties->debugMode = true;
 
-		$dateTimeProvider = new DateTimeProvider();
+		$dateTimeProvider = new DateTimeProvider(new PublicHolidayChecker());
 
 		$logger = new Logger($this->logDir);
 		$environment = new Localization\Environment($properties, $logger);
@@ -126,10 +127,10 @@ class DateTimeProviderTest extends TestCase
 		$this->translator->setLanguage(SupportedLanguages::ENGLISH->value);
 
 		$a = new DateTimeImmutable();
-		$b = $a->setDate(2020, 10, 28)
+		$b = $a->setDate(2020, 01, 01)
 			->setTime(16, 8, 0);
 
-		Assert::equal('28. 10. 2020 16:08', $dateTimeProvider->format($b));
+		Assert::equal('1. 1. 2020 16:08', $dateTimeProvider->format($b));
 
 		Assert::true($dateTimeProvider->isPublicHoliday($b));
 
@@ -143,7 +144,7 @@ class DateTimeProviderTest extends TestCase
 		Assert::true($dateTimeProvider->isFuture($a->modify('+1 month')));
 
 		Assert::false($dateTimeProvider->isWeekend($b));
-		Assert::true($dateTimeProvider->isWeekend($b->modify('+3 days'))); // saturday 31. 10. 2020
+		Assert::true($dateTimeProvider->isWeekend($b->modify('+3 days'))); // saturday 4. 1. 2023
 
 		Assert::true($dateTimeProvider->isCurrentMonth($a));
 		Assert::false($dateTimeProvider->isCurrentMonth($b));
@@ -152,9 +153,9 @@ class DateTimeProviderTest extends TestCase
 		Assert::false($dateTimeProvider->isCurrentYear($b));
 
 		Assert::equal('wednesday', $dateTimeProvider->formatDay($b));
-		Assert::equal('october', $dateTimeProvider->formatMonth($b));
+		Assert::equal('january', $dateTimeProvider->formatMonth($b));
 
-		Assert::equal('28. 10. 2020', $dateTimeProvider->formatDate($b));
+		Assert::equal('1. 1. 2020', $dateTimeProvider->formatDate($b));
 		Assert::equal('16:08', $dateTimeProvider->formatTime($b));
 
 		Assert::equal('just now', $dateTimeProvider->ago($a));
@@ -250,10 +251,28 @@ class DateTimeProviderTest extends TestCase
 
 	public function testCustomConfig(): void
 	{
-		$dateTimeProvider = new DateTimeProvider([
+		$properties = new Localization\EnvironmentProperties();
+		$properties->supportedLanguages = SupportedLanguages::cases();
+		$properties->appDir = __DIR__ . '/../';
+		$properties->translationsDirectoryName = 'translations';
+		$properties->defaultNamespace = 'Flexsyscz\DateTime\DateTimeProvider';
+		$properties->logging = true;
+		$properties->debugMode = true;
+
+		$publicHolidayChecker = new PublicHolidayChecker(['cs_CZ' => ['Y-04-01']]);
+		$dateTimeProvider = new DateTimeProvider($publicHolidayChecker, [
 			'date' => 'Y-m-d',
 			'time' => 'H:i:s'
-		], ['Y-04-01']);
+		]);
+
+		$logger = new Logger($this->logDir);
+
+		$environment = new Localization\Environment($properties, $logger);
+		$dictionariesRepository = new Localization\DictionariesRepository($environment);
+		$translator = new Localization\Translator($dictionariesRepository);
+		$translator->setup(SupportedLanguages::CZECH->value, SupportedLanguages::ENGLISH->value);
+		$dateTimeProvider->injectTranslator(new Localization\TranslatorNamespaceFactory($translator, $dictionariesRepository));
+
 
 		$a = new DateTimeImmutable();
 		$b = $a->setDate(2020, 4, 1)
@@ -268,6 +287,9 @@ class DateTimeProviderTest extends TestCase
 
 		$c = $a->setDate(2022, 4, 18);
 		Assert::true($dateTimeProvider->isPublicHoliday($c)); // easter (monday)
+
+		$translator->setLanguage(SupportedLanguages::SLOVAK->value);
+		Assert::false($dateTimeProvider->isPublicHoliday($b)); // sk_SK not defined
 	}
 }
 
