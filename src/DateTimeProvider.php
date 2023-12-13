@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Flexsyscz\DateTime;
 
+use DateTimeImmutable as DateTimeImmutableNative;
+use DateTimeZone;
 use Flexsyscz\Localization\TranslatedComponent;
 use Nette\Utils\Strings;
 use Nextras\Dbal\Utils\DateTimeImmutable;
@@ -38,6 +40,22 @@ class DateTimeProvider
 	public static function now(): DateTimeImmutable
 	{
 		return new DateTimeImmutable;
+	}
+
+
+	public static function createFromFormat(string $format, string $datetime, ?DateTimeZone $timezone = null): DateTimeImmutable|false
+	{
+		$datetimeObject = DateTimeImmutableNative::createFromFormat($format, $datetime, $timezone);
+		if ($datetimeObject instanceof DateTimeImmutableNative) {
+			$now = self::now();
+			if ($timezone) {
+				$now = $now->setTimezone($timezone);
+			}
+
+			return $now->setTimestamp($datetimeObject->getTimestamp());
+		}
+
+		return false;
 	}
 
 
