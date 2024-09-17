@@ -62,4 +62,14 @@ final class PublicHolidayChecker
 
 		return false;
 	}
+
+
+	/**
+	 * @param string $language
+	 * @return DateTimeImmutable[]
+	 */
+	public function getPublicHolidays(string $language): array
+	{
+		return $this->publicHolidays[$language] ?? [];
+	}
 }
