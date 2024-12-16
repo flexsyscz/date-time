@@ -121,6 +121,12 @@ class DateTimeProvider
 	}
 
 
+	public function formatCallback(DateTimeImmutable $dateTime, callable $callback): string
+	{
+		return call_user_func($callback, $dateTime);
+	}
+
+	
 	public function isToday(DateTimeImmutable $dateTime): bool
 	{
 		$mask = 'Y-m-d';
