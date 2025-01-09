@@ -6,6 +6,7 @@ namespace Flexsyscz\DateTime;
 
 use DateTimeImmutable as DateTimeImmutableNative;
 use DateTimeZone;
+use Exception;
 use Flexsyscz\Localization\TranslatedComponent;
 use Nette\Utils\Strings;
 use Nextras\Dbal\Utils\DateTimeImmutable;
@@ -21,19 +22,16 @@ class DateTimeProvider
 	private PublicHolidayChecker $publicHolidayChecker;
 
 
-	/**
-	 * @param array|string[] $format
-	 * @param PublicHolidayChecker $publicHolidayChecker
-	 */
 	public function __construct(
 		PublicHolidayChecker $publicHolidayChecker,
-		array $format = ['date' => 'j. n. Y', 'time' => 'H:i'],
+		string $formatDate = null,
+		string $formatTime = null,
 	)
 	{
 		$this->publicHolidayChecker = $publicHolidayChecker;
 
-		$this->locale['date'] = $format['date'];
-		$this->locale['time'] = $format['time'];
+		$this->locale['date'] = $formatDate ?? DateTimeFormat::Date->value;
+		$this->locale['time'] = $formatTime ?? DateTimeFormat::TimeWoSecs->value;
 	}
 
 
@@ -43,8 +41,23 @@ class DateTimeProvider
 	}
 
 
+	/**
+	 * @param string $format
+	 * @param string $datetime
+	 * @param DateTimeZone|null $timezone
+	 * @return DateTimeImmutable|false
+	 * @throws Exception
+	 */
 	public static function createFromFormat(string $format, string $datetime, ?DateTimeZone $timezone = null): DateTimeImmutable|false
 	{
+		if ($format === 'c') {
+			try {
+				return new DateTimeImmutable($datetime);
+			} catch (Exception $e) {
+				throw new InvalidDateTimeException('Invalid datetime format', 0, $e);
+			}
+		}
+
 		$datetimeObject = DateTimeImmutableNative::createFromFormat($format, $datetime, $timezone);
 		if ($datetimeObject instanceof DateTimeImmutableNative) {
 			$now = self::now();
@@ -162,13 +175,13 @@ class DateTimeProvider
 
 	public function isPast(DateTimeImmutable $dateTime): bool
 	{
-		return self::now()->getTimestamp() > $dateTime->getTimestamp();
+		return self::now() > $dateTime;
 	}
 
 
 	public function isFuture(DateTimeImmutable $dateTime): bool
 	{
-		return self::now()->getTimestamp() < $dateTime->getTimestamp();
+		return self::now() < $dateTime;
 	}
 
 

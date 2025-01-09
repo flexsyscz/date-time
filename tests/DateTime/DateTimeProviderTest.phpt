@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\DateTime;
 
+use Flexsyscz\DateTime\DateTimeFormat;
 use Flexsyscz\DateTime\DateTimeProvider;
 use Flexsyscz\DateTime\PublicHolidayChecker;
 use Flexsyscz\Localization;
@@ -128,7 +129,9 @@ class DateTimeProviderTest extends TestCase
 
 		$a = new DateTimeImmutable();
 		$b = $a->setDate(2020, 01, 01)
-			->setTime(16, 8, 0);
+			->setTime(16, 8);
+		$c = $a->setDate(2020, (int) date('n') + 1, 02)
+			->setTime(9, 30);
 
 		Assert::equal('1. 1. 2020 16:08', $dateTimeProvider->format($b));
 
@@ -147,7 +150,7 @@ class DateTimeProviderTest extends TestCase
 		Assert::true($dateTimeProvider->isWeekend($b->modify('+3 days'))); // saturday 4. 1. 2023
 
 		Assert::true($dateTimeProvider->isCurrentMonth($a));
-		Assert::false($dateTimeProvider->isCurrentMonth($b));
+		Assert::false($dateTimeProvider->isCurrentMonth($c));
 
 		Assert::true($dateTimeProvider->isCurrentYear($a));
 		Assert::false($dateTimeProvider->isCurrentYear($b));
@@ -260,10 +263,7 @@ class DateTimeProviderTest extends TestCase
 		$properties->debugMode = true;
 
 		$publicHolidayChecker = new PublicHolidayChecker(['cs_CZ' => ['Y-04-01']]);
-		$dateTimeProvider = new DateTimeProvider($publicHolidayChecker, [
-			'date' => 'Y-m-d',
-			'time' => 'H:i:s'
-		]);
+		$dateTimeProvider = new DateTimeProvider($publicHolidayChecker, DateTimeFormat::Ymd->value, DateTimeFormat::Time->value);
 
 		$logger = new Logger($this->logDir);
 
