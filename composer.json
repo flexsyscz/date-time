@@ -14,7 +14,7 @@
 		"php": ">=8.1",
 		"nette/utils": "^4.0",
 		"nextras/orm": "^5.0",
-		"flexsyscz/localization": "^1.0",
+		"flexsyscz/localization": "^2.0",
 		"ext-calendar": "*"
 	},
 	"require-dev": {

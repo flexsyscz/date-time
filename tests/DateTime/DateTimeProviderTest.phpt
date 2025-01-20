@@ -7,7 +7,10 @@ namespace Tests\DateTime;
 use Flexsyscz\DateTime\DateTimeFormat;
 use Flexsyscz\DateTime\DateTimeProvider;
 use Flexsyscz\DateTime\PublicHolidayChecker;
+use Flexsyscz\FileSystem\Directories\AppDirectory;
+use Flexsyscz\FileSystem\Directories\DocumentRoot;
 use Flexsyscz\Localization;
+use Flexsyscz\Localization\Translations\Configurator;
 use Nextras\Dbal\Utils\DateTimeImmutable;
 use Tester\Assert;
 use Tester\TestCase;
@@ -24,7 +27,9 @@ class DateTimeProviderTest extends TestCase
 {
 	private string $logDir;
 
-	private Localization\Translator $translator;
+	private Localization\Translations\Repository $repository;
+	private Localization\Translations\Translator $translator;
+	private Configurator $configurator;
 	private DateTimeProvider $dateTimeProvider;
 
 
@@ -35,24 +40,16 @@ class DateTimeProviderTest extends TestCase
 			@mkdir($this->logDir);
 		}
 
-		$properties = new Localization\EnvironmentProperties();
-		$properties->supportedLanguages = SupportedLanguages::cases();
-		$properties->appDir = __DIR__ . '/../';
-		$properties->translationsDirectoryName = 'translations';
-		$properties->defaultNamespace = 'Flexsyscz\DateTime\DateTimeProvider';
-		$properties->logging = true;
-		$properties->debugMode = true;
+		$documentRoot = new DocumentRoot(__DIR__ . '/../../');
+		$appDir = new AppDirectory( __DIR__ . '/../../', $documentRoot);
+		$tracyLogger = new Logger($this->logDir);
+		$this->configurator = new Configurator($appDir, SupportedLanguages::Czech, debugMode: true, logging: true, defaultNamespace: DateTimeProvider::class);
+		$logger = new Localization\Translations\Logger($this->configurator, $tracyLogger);
+		$this->repository = new Localization\Translations\Repository($this->configurator, $logger);
+		$this->translator = new Localization\Translations\Translator($this->configurator, $this->repository, $logger);
 
 		$dateTimeProvider = new DateTimeProvider(new PublicHolidayChecker());
-
-		$logger = new Logger($this->logDir);
-		$environment = new Localization\Environment($properties, $logger);
-		$dictionariesRepository = new Localization\DictionariesRepository($environment);
-		$translator = new Localization\Translator($dictionariesRepository);
-		$translator->setup(SupportedLanguages::CZECH->value, SupportedLanguages::ENGLISH->value);
-		$dateTimeProvider->injectTranslator(new Localization\TranslatorNamespaceFactory($translator, $dictionariesRepository));
-
-		$this->translator = $translator;
+		$dateTimeProvider->injectTranslator(new Localization\Translations\TranslatorNamespaceFactory($this->configurator, $this->translator, $this->repository));
 		$this->dateTimeProvider = $dateTimeProvider;
 	}
 
@@ -60,7 +57,7 @@ class DateTimeProviderTest extends TestCase
 	{
 		$dateTimeProvider = $this->dateTimeProvider;
 
-		$this->translator->setLanguage(SupportedLanguages::CZECH->value);
+		$this->translator->setLanguage(SupportedLanguages::Czech);
 
 		$a = new DateTimeImmutable();
 		$b = $a->setDate(2020, 10, 28)
@@ -125,7 +122,7 @@ class DateTimeProviderTest extends TestCase
 	{
 		$dateTimeProvider = $this->dateTimeProvider;
 
-		$this->translator->setLanguage(SupportedLanguages::ENGLISH->value);
+		$this->translator->setLanguage(SupportedLanguages::English);
 
 		$a = new DateTimeImmutable();
 		$b = $a->setDate(2020, 01, 01)
@@ -192,7 +189,7 @@ class DateTimeProviderTest extends TestCase
 	{
 		$dateTimeProvider = $this->dateTimeProvider;
 
-		$this->translator->setLanguage(SupportedLanguages::SLOVAK->value);
+		$this->translator->setLanguage(SupportedLanguages::Slovak);
 
 		$a = new DateTimeImmutable();
 		$b = $a->setDate(2020, 10, 28)
@@ -254,24 +251,18 @@ class DateTimeProviderTest extends TestCase
 
 	public function testCustomConfig(): void
 	{
-		$properties = new Localization\EnvironmentProperties();
-		$properties->supportedLanguages = SupportedLanguages::cases();
-		$properties->appDir = __DIR__ . '/../';
-		$properties->translationsDirectoryName = 'translations';
-		$properties->defaultNamespace = 'Flexsyscz\DateTime\DateTimeProvider';
-		$properties->logging = true;
-		$properties->debugMode = true;
+		$documentRoot = new DocumentRoot(__DIR__ . '/../../');
+		$appDir = new AppDirectory( __DIR__ . '/../../', $documentRoot);
+		$tracyLogger = new Logger($this->logDir);
+		$this->configurator = new Configurator($appDir, SupportedLanguages::Czech, debugMode: true, logging: true, defaultNamespace: DateTimeProvider::class);
+		$logger = new Localization\Translations\Logger($this->configurator, $tracyLogger);
+		$this->repository = new Localization\Translations\Repository($this->configurator, $logger);
+		$this->translator = new Localization\Translations\Translator($this->configurator, $this->repository, $logger);
 
 		$publicHolidayChecker = new PublicHolidayChecker(['cs_CZ' => ['Y-04-01']]);
 		$dateTimeProvider = new DateTimeProvider($publicHolidayChecker, DateTimeFormat::Ymd->value, DateTimeFormat::Time->value);
 
-		$logger = new Logger($this->logDir);
-
-		$environment = new Localization\Environment($properties, $logger);
-		$dictionariesRepository = new Localization\DictionariesRepository($environment);
-		$translator = new Localization\Translator($dictionariesRepository);
-		$translator->setup(SupportedLanguages::CZECH->value, SupportedLanguages::ENGLISH->value);
-		$dateTimeProvider->injectTranslator(new Localization\TranslatorNamespaceFactory($translator, $dictionariesRepository));
+		$dateTimeProvider->injectTranslator(new Localization\Translations\TranslatorNamespaceFactory($this->configurator, $this->translator, $this->repository));
 
 
 		$a = new DateTimeImmutable();
@@ -288,7 +279,7 @@ class DateTimeProviderTest extends TestCase
 		$c = $a->setDate(2022, 4, 18);
 		Assert::true($dateTimeProvider->isPublicHoliday($c)); // easter (monday)
 
-		$translator->setLanguage(SupportedLanguages::SLOVAK->value);
+		$this->translator->setLanguage(SupportedLanguages::Slovak);
 		Assert::false($dateTimeProvider->isPublicHoliday($b)); // sk_SK not defined
 	}
 }

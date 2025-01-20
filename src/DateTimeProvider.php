@@ -7,7 +7,7 @@ namespace Flexsyscz\DateTime;
 use DateTimeImmutable as DateTimeImmutableNative;
 use DateTimeZone;
 use Exception;
-use Flexsyscz\Localization\TranslatedComponent;
+use Flexsyscz\Localization\Translations\TranslatedComponent;
 use Nette\Utils\Strings;
 use Nextras\Dbal\Utils\DateTimeImmutable;
 
@@ -187,7 +187,7 @@ class DateTimeProvider
 
 	public function isPublicHoliday(DateTimeImmutable $dateTime): bool
 	{
-		return $this->publicHolidayChecker->check($this->translatorNamespace->getTranslator()->getLanguage(), $dateTime);
+		return $this->publicHolidayChecker->check($this->translatorNamespace->translator->getLanguage(), $dateTime);
 	}
 
 
