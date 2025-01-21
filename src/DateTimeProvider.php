@@ -24,8 +24,8 @@ class DateTimeProvider
 
 	public function __construct(
 		PublicHolidayChecker $publicHolidayChecker,
-		string $formatDate = null,
-		string $formatTime = null,
+		?string $formatDate = null,
+		?string $formatTime = null,
 	)
 	{
 		$this->publicHolidayChecker = $publicHolidayChecker;
