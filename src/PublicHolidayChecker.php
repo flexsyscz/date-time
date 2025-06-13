@@ -18,7 +18,7 @@ final class PublicHolidayChecker
 	 * @param string|array<string[]>$customConfig
 	 * @throws \Exception
 	 */
-	public function __construct(string|array $customConfig = null)
+	public function __construct(string|array|null $customConfig = null)
 	{
 		$this->publicHolidays = [];
 
