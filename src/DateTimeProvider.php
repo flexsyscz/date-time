@@ -72,7 +72,7 @@ class DateTimeProvider
 	}
 
 
-	public function ago(DateTimeImmutable $ago): string
+	public function ago(DateTimeImmutableNative $ago): string
 	{
 		$params = [
 			'y' => 'year',
@@ -104,94 +104,94 @@ class DateTimeProvider
 	}
 
 
-	public function format(DateTimeImmutable $dateTime): string
+	public function format(DateTimeImmutableNative $dateTime): string
 	{
 		return $dateTime->format(sprintf('%s %s', $this->locale['date'], $this->locale['time']));
 	}
 
 
-	public function formatDate(DateTimeImmutable $dateTime): string
+	public function formatDate(DateTimeImmutableNative $dateTime): string
 	{
 		return $dateTime->format($this->locale['date']);
 	}
 
 
-	public function formatTime(DateTimeImmutable $dateTime): string
+	public function formatTime(DateTimeImmutableNative $dateTime): string
 	{
 		return $dateTime->format($this->locale['time']);
 	}
 
 
-	public function formatMonth(DateTimeImmutable $dateTime): string
+	public function formatMonth(DateTimeImmutableNative $dateTime): string
 	{
 		return $this->translatorNamespace->translate(sprintf('months.%s', Strings::lower($dateTime->format('F'))));
 	}
 
 
-	public function formatDay(DateTimeImmutable $dateTime): string
+	public function formatDay(DateTimeImmutableNative $dateTime): string
 	{
 		return $this->translatorNamespace->translate(sprintf('days.%s', Strings::lower($dateTime->format('l'))));
 	}
 
 
-	public function formatCallback(DateTimeImmutable $dateTime, callable $callback): string
+	public function formatCallback(DateTimeImmutableNative $dateTime, callable $callback): string
 	{
 		return call_user_func($callback, $dateTime);
 	}
 
 	
-	public function isToday(DateTimeImmutable $dateTime): bool
+	public function isToday(DateTimeImmutableNative $dateTime): bool
 	{
 		$mask = 'Y-m-d';
 		return self::now()->format($mask) === $dateTime->format($mask);
 	}
 
 
-	public function isYesterday(DateTimeImmutable $dateTime): bool
+	public function isYesterday(DateTimeImmutableNative $dateTime): bool
 	{
 		$mask = 'Y-m-d';
 		return self::now()->modify('-1 day')->format($mask) === $dateTime->format($mask);
 	}
 
 
-	public function isTomorrow(DateTimeImmutable $dateTime): bool
+	public function isTomorrow(DateTimeImmutableNative $dateTime): bool
 	{
 		$mask = 'Y-m-d';
 		return self::now()->modify('+1 day')->format($mask) === $dateTime->format($mask);
 	}
 
 
-	public function isCurrentMonth(DateTimeImmutable $dateTime): bool
+	public function isCurrentMonth(DateTimeImmutableNative $dateTime): bool
 	{
 		return self::now()->format('F') === $dateTime->format('F');
 	}
 
 
-	public function isCurrentYear(DateTimeImmutable $dateTime): bool
+	public function isCurrentYear(DateTimeImmutableNative $dateTime): bool
 	{
 		return self::now()->format('Y') === $dateTime->format('Y');
 	}
 
 
-	public function isPast(DateTimeImmutable $dateTime): bool
+	public function isPast(DateTimeImmutableNative $dateTime): bool
 	{
 		return self::now() > $dateTime;
 	}
 
 
-	public function isFuture(DateTimeImmutable $dateTime): bool
+	public function isFuture(DateTimeImmutableNative $dateTime): bool
 	{
 		return self::now() < $dateTime;
 	}
 
 
-	public function isPublicHoliday(DateTimeImmutable $dateTime): bool
+	public function isPublicHoliday(DateTimeImmutableNative $dateTime): bool
 	{
 		return $this->publicHolidayChecker->check($this->translatorNamespace->translator->getLanguage(), $dateTime);
 	}
 
 
-	public function isWeekend(DateTimeImmutable $dateTime): bool
+	public function isWeekend(DateTimeImmutableNative $dateTime): bool
 	{
 		return (int) ($dateTime->format('N')) >= 6;
 	}

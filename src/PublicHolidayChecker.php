@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Flexsyscz\DateTime;
 
+use DateTimeImmutable as DateTimeImmutableNative;
 use Nette\Neon\Neon;
 use Nextras\Dbal\Utils\DateTimeImmutable;
 
@@ -41,7 +42,7 @@ final class PublicHolidayChecker
 	}
 
 
-	public function check(?string $language, DateTimeImmutable $dateTime): bool
+	public function check(?string $language, DateTimeImmutableNative $dateTime): bool
 	{
 		if($language && isset($this->publicHolidays[$language])) {
 			foreach ($this->publicHolidays[$language] as $publicHoliday) {
